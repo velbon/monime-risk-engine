@@ -27,14 +27,32 @@ st.caption("Every uploaded CRM export is stored permanently, scored against AML 
 TIER_COLOURS = {TIER_HIGH: "#FF4B4B", TIER_MEDIUM: "#FFAA00", TIER_LOW: "#00CC66"}
 
 
+SECRET_FORMAT = 'Settings → Secrets must contain exactly one line like:  DATABASE_URL = "postgresql://..."'
+
+
+def secret_database_url():
+    """DATABASE_URL from st.secrets, explaining the usual ways the secret is mis-entered."""
+    try:
+        keys = list(st.secrets.keys())
+    except Exception as exc:
+        if "pars" in str(exc).lower():
+            raise RuntimeError("The app's secrets are not valid TOML (often a missing "
+                               f"'DATABASE_URL =' or missing quotes). {SECRET_FORMAT}") from exc
+        return None  # no secrets configured
+    if "DATABASE_URL" in keys:
+        return st.secrets["DATABASE_URL"]
+    if keys:
+        raise RuntimeError(f"The secrets define {keys} but not DATABASE_URL (the name is "
+                           f"case-sensitive). {SECRET_FORMAT}")
+    return None
+
+
 @st.cache_resource
 def engine():
-    url = None
-    try:
-        url = st.secrets.get("DATABASE_URL")
-    except Exception:
-        pass
-    eng = get_engine(url or os.environ.get("DATABASE_URL"))
+    url = secret_database_url() or os.environ.get("DATABASE_URL")
+    if not url:
+        raise RuntimeError(f"DATABASE_URL is not set. {SECRET_FORMAT}")
+    eng = get_engine(url)
     init_schema(eng)
     return eng
 
@@ -136,8 +154,7 @@ def generate_pdf_report(primary_date, currency, scores, alerts, coverage):
 try:
     db = engine()
 except Exception as exc:
-    st.error(f"Cannot connect to the database: {exc}\n\n"
-             "Set DATABASE_URL in the app's secrets (Streamlit Cloud: Settings → Secrets).")
+    st.error(f"Cannot connect to the database: {exc}")
     st.stop()
 
 # --- SIDEBAR: WHO + UPLOAD ---
