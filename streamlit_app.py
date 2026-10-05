@@ -196,7 +196,7 @@ if uploaded_file:
                     "Tier 1 (Low Risk - Auto Settlement)": "#00CC66"
                 }
             )
-            st.plotly_chart(fig_bar, use_container_width=True)
+            st.plotly_chart(fig_bar, width="stretch")
 
         with col_right:
             avg_score = merchant_summary['Total_Risk_Score'].mean()
@@ -214,7 +214,7 @@ if uploaded_file:
                     ]
                 }
             ))
-            st.plotly_chart(fig_gauge, use_container_width=True)
+            st.plotly_chart(fig_gauge, width="stretch")
 
     with tab2:
         st.subheader("Hourly Transaction & Off-Hours Velocity")
@@ -222,7 +222,7 @@ if uploaded_file:
         hourly_df = df_analyzed.groupby(['hour', 'Actual_Provider']).size().reset_index(name='txns')
         
         fig_hourly = px.area(hourly_df, x='hour', y='txns', color='Actual_Provider', title="Hourly Transaction Concentration (GMT)")
-        st.plotly_chart(fig_hourly, use_container_width=True)
+        st.plotly_chart(fig_hourly, width="stretch")
 
         st.subheader("Volume vs Risk Exposure Map (Declared Volume Discrepancies)")
         fig_scatter = px.scatter(
@@ -235,7 +235,7 @@ if uploaded_file:
             log_x=True,
             title="Volume vs Risk Exposure Map (Red = Volume Discrepancy Flagged)"
         )
-        st.plotly_chart(fig_scatter, use_container_width=True)
+        st.plotly_chart(fig_scatter, width="stretch")
 
     with tab3:
         st.subheader("Recommended Settlement & Rolling Reserve Holds")
@@ -251,7 +251,7 @@ if uploaded_file:
                 "Rolling_Reserve_Hold": st.column_config.NumberColumn("Reserve Holdback (SLL)", format="%.2f"),
                 "is_vol_discrepancy": st.column_config.CheckboxColumn("Volume Discrepancy Alert"),
             },
-            use_container_width=True
+            width="stretch"
         )
 
 else:
