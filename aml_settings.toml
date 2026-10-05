@@ -1,0 +1,75 @@
+# Thresholds for the AML rules in compliance_engine.py.
+#
+# Amount thresholds are per currency. The high-value lines below are working
+# defaults: confirm them against current Bank of Sierra Leone / FIU reporting
+# guidance before relying on them.
+
+[currency.SLE]
+high_value = 10000          # single transaction at or above this is high value
+round_amount_unit = 1000    # amounts that are exact multiples of this are "round"
+new_merchant_volume = 50000 # daily volume that is notable for a newly seen merchant
+
+[currency.USD]
+high_value = 500
+round_amount_unit = 100
+new_merchant_volume = 2500
+
+[rules]
+off_hours = [23, 0, 1, 2, 3, 4]   # GMT hours
+off_hours_min_txns = 20           # ignore merchants with fewer transactions that day
+off_hours_min_share = 0.25        # flag when this share of a merchant's txns is off-hours...
+off_hours_platform_multiple = 2.0 # ...and it is at least this multiple of the platform share
+
+structuring_band = 0.9            # amounts in [band x high_value, high_value)
+structuring_min_count = 3
+
+missing_ref_min_txns = 5
+missing_ref_min_share = 0.2
+
+round_amount_min_count = 5
+round_amount_min_share = 0.5
+
+burst_window_minutes = 5
+burst_min_txns = 30               # peak window must hold at least this many txns...
+burst_multiple = 5.0              # ...and be this multiple of the merchant's average window
+
+spike_lookback_days = 30
+spike_min_history_days = 5        # days of history needed before spikes are judged
+spike_ratio = 3.0                 # day volume vs median daily volume
+
+new_merchant_days = 7
+declared_volume_tolerance = 1.5   # flag when volume exceeds declared daily volume by this factor
+
+counterparty_min_merchants = 3    # one phone number paying/paid by this many merchants in a day
+
+# Merchant categories guessed from whole words in the merchant name. A category
+# set in the merchant profile always takes precedence over these guesses.
+[industry]
+high = ["BET", "BETTING", "GAMING", "CASINO", "LOTTO", "LOTTERY", "CRYPTO", "SWAP", "FOREX", "REMIT", "REMITTANCE"]
+medium = ["FMCG", "EXPRESS", "RIDE", "GYM", "HOTEL", "FITNESS"]
+low = ["MINISTRY", "GOVT", "GOVERNMENT", "HEALTH", "HOSPITAL", "SCHOOL"]
+
+[points]
+industry_high = 25
+industry_medium = 15
+industry_unknown = 10
+industry_low = 5
+high_value_each = 3
+high_value_max = 15
+structuring = 15
+missing_ref_max = 15
+off_hours = 10
+round_amounts = 10
+burst = 10
+volume_spike = 20
+new_merchant = 15
+declared_volume = 20
+duplicate_provider_ref = 5
+
+[tiers]
+high = 66
+medium = 36
+
+[reserve]
+high = 0.15
+medium = 0.05
